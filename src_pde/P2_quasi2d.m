@@ -1,5 +1,6 @@
-%Implementation of a vorticity-streamfunction method with a pseudo-spectral.
-%Time-discretization: third-order Runge-Kutta 
+%Implementation of a vorticity-streamfunction method for quasi 2D-turbulence.
+%Space discretization: Pseudo-spectral.
+%Time-discretization: Third-order Runge-Kutta 
 
 M = 256; % number of points
 N = M;
@@ -8,7 +9,7 @@ Ly = 2*pi;
 nu = 5e-4; % kinematic viscosity 
 Sc = 0.7; % Schmidt number
 beta = 0; % meridional gradient of Coriolis parameter
-ar = 0.02; %random number amplitude
+ar = 0.12; %random number amplitude
 b = 1; % mean scalar gradient
 CFLmax = 0.8; 
 tend = 200; % end time
@@ -75,31 +76,6 @@ omegahat = ddx.*vhat - ddy.*uhat; % make vorticity
 
 phi = rand(size(u));
 phihat = fft2(phi);
-
-ncid = netcdf.create('turb2d6x8f.nc', 'CLOBBER');
-
-dimid_x = netcdf.defDim(ncid, 'x', M);
-dimid_y = netcdf.defDim(ncid, 'y', N);
-dimid_time = netcdf.defDim(ncid, 'time', netcdf.getConstant('NC_UNLIMITED'));
-
-varid_x = netcdf.defVar(ncid, 'x', 'NC_FLOAT', [dimid_x]);
-varid_y = netcdf.defVar(ncid, 'y', 'NC_FLOAT', [dimid_y]);
-varid_u = netcdf.defVar(ncid, 'u', 'NC_FLOAT', [dimid_x, dimid_y, dimid_time]);
-varid_v = netcdf.defVar(ncid, 'v', 'NC_FLOAT', [dimid_x, dimid_y, dimid_time]);
-varid_omega = netcdf.defVar(ncid, 'vorticity', 'NC_FLOAT', [dimid_x, dimid_y, dimid_time]);
-varid_phi = netcdf.defVar(ncid, 'scalar', 'NC_FLOAT', [dimid_x, dimid_y, dimid_time]);
-varid_dissipation = netcdf.defVar(ncid, 'dissipation', 'NC_FLOAT', [dimid_x, dimid_y, dimid_time]);
-varid_time = netcdf.defVar(ncid, 'time', 'NC_FLOAT', [dimid_time]);
-netcdf.endDef(ncid);
-
-netcdf.putVar(ncid, varid_time, 0, 1, time);
-netcdf.putVar(ncid, varid_x, 0, M, x);
-netcdf.putVar(ncid, varid_y, 0, N, y);
-netcdf.putVar(ncid, varid_phi, [0, 0, 0], [M, N, 1], phi);
-netcdf.putVar(ncid, varid_u, [0, 0, 0], [M, N, 1], u);
-netcdf.putVar(ncid, varid_v, [0, 0, 0], [M, N, 1], v);
-netcdf.putVar(ncid, varid_omega, [0, 0, 0], [M, N, 1], omega);
-netcdf.putVar(ncid, varid_dissipation, [0, 0, 0], [M, N, 1], 0*omega);
 
 dt = 0.5*min([dx dy]);
 
@@ -190,18 +166,8 @@ while time < tend
         
         fprintf(1,'step = %d    time = %g    dt = %g  CFL = %g    kmax*eta = %g %g\n', nstep, time, dt, CFL, eta.*kmax, eta.*kmax/sqrt(Sc));
         
-        [~, dim_time_len] = netcdf.inqDim(ncid,dimid_time);
-        
-        netcdf.putVar(ncid, varid_time, [dim_time_len], [1], time);
-        netcdf.putVar(ncid, varid_phi, [0, 0, dim_time_len], [M, N, 1], phi);
-        netcdf.putVar(ncid, varid_u, [0, 0, dim_time_len], [M, N, 1], u);
-        netcdf.putVar(ncid, varid_v, [0, 0, dim_time_len], [M, N, 1], v);
-        netcdf.putVar(ncid, varid_omega, [0, 0, dim_time_len], [M, N, 1], omega);
-        netcdf.putVar(ncid, varid_dissipation, [0, 0, dim_time_len], [M, N, 1], dissipation);
-        netcdf.sync(ncid);
     end
     
     dt = CFLmax/CFL*dt; %0.0005;
 end
 
-netcdf.close(ncid);
