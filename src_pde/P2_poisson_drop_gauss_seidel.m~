@@ -7,15 +7,15 @@ clear all
 %input parameters
 nx=32;
 ny=nx;
-lx=1.0;
-ly=1.0;
+lx=2.0;
+ly=2.0;
 max_err=1.e-4;
-max_iter=10000;
+max_iter=40000;
 err=2.0d0;
 dx=lx/(nx-1);
 dy=dx;
-x=zeros(nx,1);
-y=zeros(ny,1);
+x=zeros(nx,1)-lx/2;
+y=zeros(ny,1)-ly/2;
 
 
 
@@ -33,26 +33,18 @@ A0=zeros(nx,ny);
 An=zeros(nx,ny);
 rhs=zeros(nx,ny);
 
-%Boundary conditions (temperature gradient on left and bottom sides).
-for i=1:nx
-  A(i,1)=1.;%double(i-1)/double(nx-1);
-end
-for j=2:ny
-  A(nx,j)=0.;%double(ny-j)/double(ny-1);
-end
-
-% Store initial condition (just to check)
+%Boundary conditions (0 pressure on the boundaries) 
+A=0;
 A0=A;
-% Updtae An with Boundary conditons, otherwise new values are not updated.
-An=A0;
+An=A;
 
-% Computer RHS
+
+% Computer RHS (surface tension forces)
 % Generic function
-% for i=2:nx-1
-%   for j=2:ny-1
-%      % forcing on the rhs.
-%      %rhs(i,j)=10*(x(i)^2 + y(j)^2 + 10);
-%      rhs(i,j)=0;%0.5*(1-x(i)^2);
+ for i=2:nx-1
+   for j=2:ny-1
+      %rhs(i,j)=10*(x(i)^2 + y(j)^2 + 10);
+      rhs(i,j)=10*(1-x(i)^2);
    end
 end
  
@@ -63,7 +55,7 @@ iter=1;
 while ((err >= max_err) && ( iter <= max_iter))
   for i=2:nx-1
     for j=2:ny-1
-       An(i,j)=0.25*(A(i+1,j)+An(i-1,j)+A(i,j+1)+An(i,j-1)-4*dx*dx*rhs(i,j));
+       An(i,j)=0.25*(A(i+1,j)+An(i-1,j)+A(i,j+1)+An(i,j-1)-dx*dx*rhs(i,j));
     end
   end
   % Compute error
@@ -78,6 +70,7 @@ while ((err >= max_err) && ( iter <= max_iter))
 end
 
 figure(1)
+clf
 subplot(1,2,1)
 hold on
 imagesc(x,flipud(y),A0);
