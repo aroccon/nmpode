@@ -8,7 +8,6 @@ Lx = 2*pi;
 Ly = 2*pi;
 nu = 5e-4; % kinematic viscosity 
 Sc = 0.7; % Schmidt number
-beta = 0; % meridional gradient of Coriolis parameter
 ar = 0.12; %random number amplitude
 b = 1; % mean scalar gradient
 CFLmax = 0.8; 
@@ -33,19 +32,23 @@ rng(64);
 
 [u, v, omega, psi, ddx, ddy, idel2, kk, k2]=deal(zeros(M,N));
 
+%Kx-Wavenumber
 for j=1:N
     ddx(:,j)=1i*kx;
 end
 
+%Ky_wavenumber
 for i=1:M
     ddy(i,:)=1i*ky;
 end
 
+% Wavenumbers squared 
 for i=1:M
     for j=1:N
         idel2(i,j)=-kx(i)^2-ky(j)^2;
     end
 end
+% Inverse of wavenumbers squared 1/|k^2|
 idel2=1./idel2;
 idel2(1,1)=0;
 
@@ -63,6 +66,7 @@ for i=1:M
     end
 end
 
+% Initialize velocity: Taylor-Green + Random noise
 for i=1:M
     for j=1:N
         u(i,j) =  cos(2*x(i))*sin(2*y(j))+ar*rand;
@@ -70,83 +74,88 @@ for i=1:M
     end
 end
 
-uhat = fft2(u);
-vhat = fft2(v);
-omegahat = ddx.*vhat - ddy.*uhat; % make vorticity 
+% u and v in spectral space
+uc = fft2(u);
+vc = fft2(v);
+% Compute omega (vorticity) in spectral space 
+omegac = ddx.*vc - ddy.*uc; 
 
+% Initialize phi with random noise + bring it to the spectral space% (phic)
 phi = rand(size(u));
-phihat = fft2(phi);
+phic = fft2(phi);
 
 dt = 0.5*min([dx dy]);
 
 nstep = 1;
 
 while time < tend
+    % Compute streamfunction \nabla^2 \psi = -omega and from psi, uc and vc
+    psic = -idel2.*omegac;     
+    uc = ddy.*psic;           
+    vc = -ddx.*psic;           
     
-    psihat = -idel2.*omegahat;
-    uhat = ddy.*psihat;
-    vhat = -ddx.*psihat;
+    % Compute u, v from uc, vc
+    u = real(ifft2(uc));       
+    v = real(ifft2(vc));      
     
-    u = real(ifft2(uhat));
-    v = real(ifft2(vhat));
-    
-    omegadx = real(ifft2(ddx.*omegahat));
-    omegady = real(ifft2(ddy.*omegahat));
+    % Compute the derivates of omega w.r.t. to x and y.
+    omegadx = real(ifft2(ddx.*omegac));
+    omegady = real(ifft2(ddy.*omegac));
     
     facto = exp(-nu*8/15*dt*kk);
     factp = exp(-nu/Sc*8/15*dt*k2);
     
-    r0o = -fft2(u.*omegadx+v.*omegady)+beta*vhat;
-    r0p = -fft2(u.*real(ifft2(ddx.*phihat))+v.*real(ifft2(ddy.*phihat)))+b*vhat;
+    r0o = -fft2(u.*omegadx+v.*omegady);
+    r0p = -fft2(u.*real(ifft2(ddx.*phic))+v.*real(ifft2(ddy.*phic)))+b*vc;
     
-    omegahat = facto.*(omegahat + dt*8/15*r0o); % update omega
-    phihat = factp.*(phihat + dt*8/15*r0p); % update phi
+    omegac = facto.*(omegac + dt*8/15*r0o); % update omega
+    phic = factp.*(phic + dt*8/15*r0p); % update phi
 
     %%%% Substep 2
-    psihat = -idel2.*omegahat;
-    uhat = ddy.*psihat;
-    vhat = -ddx.*psihat;
+    psic = -idel2.*omegac;
+    uc = ddy.*psic;
+    vc = -ddx.*psic;
     
-    u = real(ifft2(uhat));
-    v = real(ifft2(vhat));
+    u = real(ifft2(uc));
+    v = real(ifft2(vc));
     
-    omegadx = real(ifft2(ddx.*omegahat));
-    omegady = real(ifft2(ddy.*omegahat));
+    omegadx = real(ifft2(ddx.*omegac));
+    omegady = real(ifft2(ddy.*omegac));
     
-    r1o = -fft2(u.*omegadx+v.*omegady)+beta*vhat;
-    r1p = -fft2(u.*real(ifft2(ddx.*phihat))+v.*real(ifft2(ddy.*phihat)))+b*vhat;
+    r1o = -fft2(u.*omegadx+v.*omegady);
+    r1p = -fft2(u.*real(ifft2(ddx.*phic))+v.*real(ifft2(ddy.*phic)))+b*vc;
     
-    omegahat = omegahat + dt*(-17/60*facto.*r0o + 5/12*r1o);
-    phihat = phihat + dt*(-17/60*factp.*r0p + 5/12*r1p);
+    omegac = omegac + dt*(-17/60*facto.*r0o + 5/12*r1o);
+    phic = phic + dt*(-17/60*factp.*r0p + 5/12*r1p);
     facto = exp(-nu*(-17/60+5/12)*dt*kk);
     factp = exp(-nu/Sc*(-17/60+5/12)*dt*k2);
-    omegahat = omegahat.*facto;
-    phihat = phihat.*factp;
+    omegac = omegac.*facto;
+    phic = phic.*factp;
     
     %%%% Substep 3
-    psihat = -idel2.*omegahat;
-    uhat = ddy.*psihat;
-    vhat = -ddx.*psihat;
+    psihat = -idel2.*omegac;
+    uc = ddy.*psihat;
+    vc = -ddx.*psihat;
     
-    % max(max(abs(real(ifft2(1i*ddx.*uhat+1i*ddy.*vhat))))) % divergence
+    % max(max(abs(real(ifft2(1i*ddx.*uc+1i*ddy.*vc))))) % divergence
     
-    u = real(ifft2(uhat));
-    v = real(ifft2(vhat));
+    u = real(ifft2(uc));
+    v = real(ifft2(vc));
     
-    omegadx = real(ifft2(ddx.*omegahat));
-    omegady = real(ifft2(ddy.*omegahat));
+    omegadx = real(ifft2(ddx.*omegac));
+    omegady = real(ifft2(ddy.*omegac));
     
-    r2o = -fft2(u.*omegadx+v.*omegady)+beta*vhat;
-    r2p = -fft2(u.*real(ifft2(ddx.*phihat))+v.*real(ifft2(ddy.*phihat)))+b*vhat;    
-    omegahat = omegahat + dt*(-5/12*facto.*r1o + 3/4*r2o);
-    phihat = phihat + dt*(-5/12*factp.*r1p + 3/4*r2p);
+    r2o = -fft2(u.*omegadx+v.*omegady);
+    r2p = -fft2(u.*real(ifft2(ddx.*phic))+v.*real(ifft2(ddy.*phic)))+b*vc;    
+    omegac = omegac + dt*(-5/12*facto.*r1o + 3/4*r2o);
+    phic = phic + dt*(-5/12*factp.*r1p + 3/4*r2p);
     facto = exp(-nu*(-5/12+3/4)*dt*kk);
     factp = exp(-nu/Sc*(-5/12+3/4)*dt*kk);
-    omegahat = omegahat.*facto;
-    phihat = phihat.*factp;
+    omegac = omegac.*facto;
+    phic = phic.*factp;
 
-    phihat = filter.*phihat;
-    omegahat = filter.*omegahat;
+    phic = filter.*phic;
+    omegac = filter.*omegac;
     
     time = time + dt;
     nstep = nstep + 1;
@@ -154,9 +163,9 @@ while time < tend
     CFL = max(max(abs(u)))/dx*dt+max(max(abs(v)))/dy*dt;
     
     if mod(nstep,20)==0
-        phi = real(ifft2(phihat));
-        omega = real(ifft2(omegahat));
-        dissipation = 2*nu*(real(ifft2(ddx.*uhat)).^2 + real(ifft2(ddy.*uhat)).^2 + real(ifft2(ddx.*vhat)).^2 + real(ifft2(ddy.*vhat)).^2);
+        phi = real(ifft2(phic));
+        omega = real(ifft2(omegac));
+        dissipation = 2*nu*(real(ifft2(ddx.*uc)).^2 + real(ifft2(ddy.*uc)).^2 + real(ifft2(ddx.*vc)).^2 + real(ifft2(ddy.*vc)).^2);
         eta = (nu^3/mean(dissipation,'all'))^0.25;
         
         subplot(221); pcolor(x,y,omega'); title('Vorticity'); shading flat; axis equal tight; colorbar; drawnow

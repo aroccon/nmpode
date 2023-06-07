@@ -54,14 +54,19 @@ fprintf(', time loop\n--20%%--40%%--60%%--80%%-100%%\n')
 for k = 1:nt
    % treat nonlinear terms
    gamma = min(1.2*dt*max(max(max(abs(U)))/hx,max(max(abs(V)))/hy),1);
-   Ue = [uW;U;uE]; Ue = [2*uS'-Ue(:,1) Ue 2*uN'-Ue(:,end)];
-   Ve = [vS' V vN']; Ve = [2*vW-Ve(1,:);Ve;2*vE-Ve(end,:)];
+   Ue = [uW;U;uE]; 
+   Ue = [2*uS'-Ue(:,1) Ue 2*uN'-Ue(:,end)];
+   Ve = [vS' V vN']; 
+   Ve = [2*vW-Ve(1,:);Ve;2*vE-Ve(end,:)];
    Ua = avg(Ue')'; Ud = diff(Ue')'/2;
    Va = avg(Ve);   Vd = diff(Ve)/2;
    UVx = diff(Ua.*Va-gamma*abs(Ua).*Vd)/hx;
    UVy = diff((Ua.*Va-gamma*Ud.*abs(Va))')'/hy;
-   Ua = avg(Ue(:,2:end-1));   Ud = diff(Ue(:,2:end-1))/2;
-   Va = avg(Ve(2:end-1,:)')'; Vd = diff(Ve(2:end-1,:)')'/2;
+   Ua = avg(Ue(:,2:end-1));   
+   Ud = diff(Ue(:,2:end-1))/2;
+   Va = avg(Ve(2:end-1,:)')'; 
+   Vd = diff(Ve(2:end-1,:)')'/2;
+   
    U2x = diff(Ua.^2-gamma*abs(Ua).*Ud)/hx;
    V2y = diff((Va.^2-gamma*abs(Va).*Vd)')'/hy;
    U = U-dt*(UVy(2:end-1,:)+U2x);
