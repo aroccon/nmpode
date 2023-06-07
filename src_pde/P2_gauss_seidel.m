@@ -1,5 +1,4 @@
-% Jacobi iterative solver for Laplace equation
-% Can be used also to solve linear systemm with dominant diagonal
+% Gauss-Seidel iterative solver for Laplace equation
 % 07/07/2023 A. Roccon
 % Remark: code written assuming dx=dy, bear this in mind if changing lx or
 % ly or the grid resolution.
@@ -43,12 +42,14 @@ end
 
 % Store initial condition (just to check)
 A0=A;
+% Updtae An with Boundary conditons, otherwise new values are not updated.
+An=A0;
 
 iter=1;
 while ((err >= max_err) && ( iter <= max_iter))
   for i=2:nx-1
     for j=2:ny-1
-       An(i,j)=0.25*(A(i+1,j)+A(i-1,j)+A(i,j+1)+A(i,j-1));
+       An(i,j)=0.25*(A(i+1,j)+An(i-1,j)+A(i,j+1)+An(i,j-1));
     end
   end
   % Compute error
