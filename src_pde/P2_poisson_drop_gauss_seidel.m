@@ -6,7 +6,7 @@
 clear all
 
 %input parameters
-nx=64;
+nx=128;
 ny=nx;
 lx=2.0;
 ly=2.0;
@@ -88,7 +88,7 @@ end
 rhs=zeros(nx,ny);
 for i=5:nx-4
     for j=5:ny-4
-        rhs(i,j)= - (fx(i+1,j)-fx(i-1,j))/(2*dx) - (fy(i,j+1)-fy(i,j-1))/(2*dy);
+        rhs(i,j)= (fx(i+1,j)-fx(i-1,j))/(2*dx) + (fy(i,j+1)-fy(i,j-1))/(2*dy);
     end
 end
 
@@ -116,26 +116,28 @@ figure(1)
 clf
 subplot(2,2,1)
 hold on
-imagesc(x,flipud(y),phi);
+%imagesc(x,flipud(y),phi);
+surf(x,flipud(y),phi);
 title('Droplet shape')
 hold off
 
 subplot(2,2,2)
 hold on
-imagesc(x,flipud(y),rhs);
+surf(x,flipud(y),rhs);
 title('Right-hand side')
 hold off
 
 subplot(2,2,3)
 hold on
-imagesc(x,flipud(y),A0);
+surf(x,flipud(y),A0);
 title('Initial condition')
 hold off
 
 
 subplot(2,2,4)
 hold on
-title('Final solution')
-imagesc(x,flipud(y),A);
+title('Pressure field')
+surf(x,flipud(y),A);
+colormap('jet')
 hold off
 
