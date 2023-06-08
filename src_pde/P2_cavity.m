@@ -1,4 +1,3 @@
-function cavity
 %    Solves the incompressible Navier-Stokes equations in a
 %    rectangular domain with prescribed velocities along the
 %    boundary. The solution method is finite differencing on
@@ -10,9 +9,9 @@ function cavity
 %    The standard setup solves a lid driven cavity problem.
 
 %-----------------------------------------------------------------------
-Re = 5e3;     % Reynolds number
+Re = 2e2;     % Reynolds number
 dt = 1e-3;    % time step
-tf = 100e-0;    % final time
+tf = 10e-0;    % final time
 lx = 1;       % width of box
 ly = 1;       % height of box
 nx = 90;      % number of x-gridpoints
@@ -67,8 +66,10 @@ for k = 1:nt
    Va = avg(Ve(2:end-1,:)')'; 
    Vd = diff(Ve(2:end-1,:)')'/2;
    
+   %computer d(u^2)/dx and d(v^2)/dy 
    U2x = diff(Ua.^2-gamma*abs(Ua).*Ud)/hx;
    V2y = diff((Va.^2-gamma*abs(Va).*Vd)')'/hy;
+   % Update values of interior points:
    U = U-dt*(UVy(2:end-1,:)+U2x);
    V = V-dt*(UVx(:,2:end-1)+V2y);
    
@@ -81,42 +82,44 @@ for k = 1:nt
    V = reshape(v,nx,ny-1);
    
    % pressure correction
+   % Compute divergence of the velocity field
    rhs = reshape(diff([uW;U;uE])/hx+diff([vS' V vN']')'/hy,[],1);
    p(perp) = -Rp\(Rpt\rhs(perp));
    P = reshape(p,nx,ny);
+   % Update values of interior points by 
    U = U-diff(P)/hx;
-   V = V-diff(P')'/hy;
-   
-   % visualization
-   if floor(25*k/nt)>floor(25*(k-1)/nt), fprintf('.'), end
-   if k==1|floor(nsteps*k/nt)>floor(nsteps*(k-1)/nt)
-      % stream function
-      rhs = reshape(diff(U')'/hy-diff(V)/hx,[],1);
-      q(perq) = Rq\(Rqt\rhs(perq));
-      Q = zeros(nx+1,ny+1);
-      Q(2:end-1,2:end-1) = reshape(q,nx-1,ny-1);
-      clf, contourf(avg(x),avg(y),P',20,'w-'), hold on
-      contour(x,y,Q',20,'k-');
-      Ue = [uS' avg([uW;U;uE]')' uN'];
-      Ve = [vW;avg([vS' V vN']);vE];
-      Len = sqrt(Ue.^2+Ve.^2+eps);
-      quiver(x,y,(Ue./Len)',(Ve./Len)',.4,'k-')
-      hold off, axis equal, axis([0 lx 0 ly])
-      p = sort(p); caxis(p([8 end-7]))
-      title(sprintf('Re = %0.1g   t = %0.2g',Re,k*dt))
-      drawnow
-   end
+   V = V-diff(P')'/hy; 
 end
-fprintf('\n')
 
-%=======================================================================
+figure(1)
+clf
+subplot(1,2,1)
+hold on
+imagesc(x,y,Ue')
+axis equal
+title('X - Velocity')
+hold off
+
+
+subplot(1,2,2)
+hold on
+title('Y - Velocity')
+imagesc(x,y,Ve')
+axis equal
+hold off
+
+
+
 
 function B = avg(A,k)
 if nargin<2, k = 1; end
 if size(A,1)==1, A = A'; end
 if k<2, B = (A(2:end,:)+A(1:end-1,:))/2; else, B = avg(A,k-1); end
 if size(A,2)==1, B = B'; end
+end
 
 function A = K1(n,h,a11)
 % a11: Neumann=1, Dirichlet=2, Dirichlet mid=3;
 A = spdiags([-1 a11 0;ones(n-2,1)*[-1 2 -1];0 a11 -1],-1:1,n,n)'/h^2;
+end
+
