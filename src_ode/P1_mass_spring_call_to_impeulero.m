@@ -1,5 +1,5 @@
 clear all;
-[T,Y] = P1_midpointsolver([1;0],0.1,20,@P1_derivs); 
+[T,Y] = P1_impeulerosolver([1;0],0.1,20); 
 
 figure(1)
 clf 

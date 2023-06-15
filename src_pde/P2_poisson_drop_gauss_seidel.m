@@ -6,7 +6,7 @@
 clear all
 
 %input parameters
-nx=128;
+nx=256;
 ny=nx;
 lx=2.0;
 ly=2.0;
@@ -117,19 +117,19 @@ clf
 subplot(2,2,1)
 hold on
 %imagesc(x,flipud(y),phi);
-surf(x,flipud(y),phi);
+contourf(x,flipud(y),phi);
 title('Droplet shape')
 hold off
 
 subplot(2,2,2)
 hold on
-surf(x,flipud(y),rhs);
+contourf(x,flipud(y),rhs);
 title('Right-hand side')
 hold off
 
 subplot(2,2,3)
 hold on
-surf(x,flipud(y),A0);
+contourf(x,flipud(y),A0);
 title('Initial condition')
 hold off
 
@@ -137,7 +137,7 @@ hold off
 subplot(2,2,4)
 hold on
 title('Pressure field')
-surf(x,flipud(y),A);
+contourf(x,flipud(y),A);
 colormap('jet')
 hold off
 

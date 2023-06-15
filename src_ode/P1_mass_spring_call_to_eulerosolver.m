@@ -1,4 +1,4 @@
-[T,Y] = P1_eulersolver([1;0],0.1,20,@P1_derivs); 
+[T,Y] = P1_eulerosolver([1;0],0.1,20,@P1_derivs); 
 
 figure(1)
 clf 

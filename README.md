@@ -18,11 +18,12 @@ There are two folders: src_ode and src_pde. The first contains the source code o
 - P1_derivative_check.m:  Error evaluation on the derivative using Eulero explicit method.
 - P1_error.m: Convergence of Eulero.
 - P1_error_midpoint.m: Convergence of midpoint method.
-- P1_mass_spring.m: Mass-spring system with Eulero (divergent result).
-- P1_mass_spring_call_to_eulersolver.m: Same as above but with call to function for time integration.
+- P1_mass_spring.m: Mass-spring system with explicit Forward Eulero (overestimation of the results).
+- P1_mass_spring_call_to_eulerosolver.m: Same as above but with call to function for time integration (overestimation of the results).
+- P1_mass_spring_call_to_impeulerosolver.m: Mass-spring system with implicit backwared Eulero (underestimation of the results).
 - P1_mass_spring_call_to_midpointsolver.m: Mass-spring system with midpoint method (function is used).
 - P1_mass_spring_call_to_rksolver.m: Mass-spring system with Runge-Kutta method (function is used).
-- 5 functions (called by the other subroutines): P1_derivs.m, P1_deriv1st.m, P1_rksolver.m, P1_midpointsolver.m, P1_eulersolver.m
+- 5 functions (called by the other subroutines): P1_derivs.m, P1_deriv1st.m, P1_rksolver.m, P1_midpointsolver.m, P1_eulerosolver.m, P1_impeulersolver.m
 
 ### PDEs part (P2) - folder src_pde.
 
