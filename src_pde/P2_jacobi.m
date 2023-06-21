@@ -6,7 +6,7 @@
 clear all
 
 %input parameters
-nx=32;
+nx=64;
 ny=nx;
 lx=1.0;
 ly=1.0;

@@ -2,7 +2,7 @@
 clear all
 
 % time step
-dx=0.5;
+dx=0.1;
 x_init=0;
 x_final=2;
 Nsteps = round(x_final/dx); 
@@ -17,7 +17,7 @@ y = zeros(1,length(x));
 y(1) = 1.;
 
 
-for i = 1:Nsteps-1
+for i = 1:Nsteps
       y(i+1) = y(i) - dx*y(i);
 end
 

@@ -12,7 +12,7 @@ lx=2.0;
 ly=2.0;
 max_err=1.e-4;
 max_iter=40000;
-ch=0.04; % Transition layer thickness for diffuse interface droplet
+ch=0.06; % Transition layer thickness for diffuse interface droplet
 radius=0.5; % Drop radius
 sigma=1.0;
 

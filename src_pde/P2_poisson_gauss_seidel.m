@@ -5,7 +5,7 @@
 clear all
 
 %input parameters
-nx=32;
+nx=64;
 ny=nx;
 lx=1.0;
 ly=1.0;
@@ -51,7 +51,8 @@ An=A0;
  for i=2:nx-1
    for j=2:ny-1
       %rhs(i,j)=10*(x(i)^2 + y(j)^2 + 10);
-      rhs(i,j)=10*(1-x(i)^2);
+      %rhs(i,j)=10*(1-x(i)^2);
+      rhs(nx/2,nx/2) = -1000;
    end
 end
  
