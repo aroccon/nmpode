@@ -33,6 +33,7 @@ There are two folders: src_ode and src_pde. The first contains the source code o
 - P2_black_red_gauss_seidel.m: Red-Black  Gauss-Siedel iterative method for Laplace equation in 2D (fixed aspect ratio=1 of the domain).
 - P2_poisson_gauss_seidel.m:  Gauss-Siedel iterative method for Poisson equation in 2D (fixed aspect ratio=1 of the domain).
 - P2_poisson_drop_gauss_seidel.m: Compute the pressure field obtained from a static droplet (Poisson equation in 2D, derived from P2_poisson_gauss_seidel.m).
+- P2_fast.m: FFT-based Poisson solver for Laplace forcing (with exact solution). 
 - P2_cavity.m: Solves the incompressible Navier-Stokes equations in a rectangular domain with prescribed velocities along the boundary. Equations are solved using finite difference and wit a Projection-correction method (Credit: Benjamin Seibold).
 - P2_quasi2d.m: Pseudo-spectral method for the solution of Navier-Stokes equations in a 2D box, external forcing is used to obtain an artificial turbulent-like flow.
 
