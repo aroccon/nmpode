@@ -35,7 +35,10 @@ There are two folders: src_ode and src_pde. The first contains the source code o
 - P2_poisson_drop_gauss_seidel.m: Compute the pressure field obtained from a static droplet (Poisson equation in 2D, derived from P2_poisson_gauss_seidel.m).
 - P2_fast.m: FFT-based Poisson solver for Laplace forcing (with exact solution). 
 - P2_cavity.m: Solves the incompressible Navier-Stokes equations in a rectangular domain with prescribed velocities along the boundary. Equations are solved using finite difference and wit a Projection-correction method (Credit: Benjamin Seibold).
+- P2_cavity_peda.m: Solves the incompressible Navier-Stokes equations in a rectangular domain with prescribed velocities along the boundary. Equations are solved using finite difference and wit a Projection-correction method, written in the most pedagogic way possible.
 - P2_quasi2d.m: Pseudo-spectral method for the solution of Navier-Stokes equations in a 2D box, external forcing is used to obtain an artificial turbulent-like flow.
+- P2_hit.m: 2nd orden FD solver of Homogenous isotropic turbulence (HIT), use P2_fastPoisson3d.m to solve the Poisson equation for Pressure.
+- P2_vtkwrite.m: Create a paraview file for visualization and rendering.
 
 ### Final 
 
