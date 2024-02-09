@@ -1,7 +1,7 @@
 # Welcome to nmpode!
 
 Git repository of the course "Numerical methods for ODEs and PDEs".
-University of Udine, 2023.
+University of Udine, 2024.
 
 ## Handbook with notes
 
