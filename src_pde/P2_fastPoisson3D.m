@@ -1,4 +1,4 @@
-function [p] = P2_poissonfast(nx,rhs)
+function [p] = poissonfast(nx,rhs)
 
 % 3D FFT for Fourier-spectral solution of
 % p_xx + p_yy  + p_zz = rhs;
@@ -9,7 +9,7 @@ k = [0:(nx/2-1) (-nx/2):(-1)];
 % Laplacian matrix acting on the wavenumbers
 delsq = -(kx.^2 + ky.^2 + kz.^2); 
 % Laplacian matrix acting on the wavenumbers
-% avodi solving zero waevnumber
+% avois solving zero wavenumber
 delsq(1,1,1) = 1;  
 
 % trasnform of rhsp
