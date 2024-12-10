@@ -155,7 +155,7 @@ end
 % It is a mess to use density variatons and Neumann BCs, because it is not
 % so easy to assembel the matrix Abig (see function poisson solver).
 
-p=poisson_solver_neumann_direct(xs,ys,rhsp);
+p=P2_poisson_solver_neumann_direct(xs,ys,rhsp);
 
 % Correct velocity 
 for i=2:nx+2
