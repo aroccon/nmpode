@@ -43,3 +43,5 @@ There are two folders: src_ode and src_pde. The first contains the source code o
 ### Final 
 
 Feel free to modify and use the codes as you wish. Please let me know if you find any bugs.
+
+IDEA for 2024 edition: ChatGPT?
