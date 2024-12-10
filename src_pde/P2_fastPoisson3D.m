@@ -1,4 +1,4 @@
-function [p] = poissonfast(nx,rhs)
+function [p] = P2_fastPoisson3D(nx,rhs)
 
 % 3D FFT for Fourier-spectral solution of
 % p_xx + p_yy  + p_zz = rhs;

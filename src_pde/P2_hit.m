@@ -6,7 +6,7 @@
 % homogeneous isotropic turbulence)
 % Qualitative results seem fine
 
-clear
+clear all
 % parameters
 % domain size is 2*pi along all directions
 % same grid spacing
@@ -182,9 +182,9 @@ for i=1:nx
     end
 end
 
-disp(max(max(max(ustar))))
-disp(max(max(max(vstar))))
-disp(max(max(max(wstar))))
+%disp(max(max(max(ustar))))
+%disp(max(max(max(vstar))))
+%disp(max(max(max(wstar))))
 
 % Compute rhs of Poisson equation div*ustar
 % Compute divergence at the cell center (nx+1 avilable on u,v,w)
@@ -204,12 +204,10 @@ for i=1:nx
     end
 end
 
-disp(max(max(max(rhsp))))
-
-return
+%disp(max(max(max(rhsp))))
 
 % call Poisson solver (3DFastPoissonsolver, periodic BCs)
-p = poissonfast(nx,rhsp);
+p = P2_fastPoisson3D(nx,rhsp);
 
 
 % Correct velocity 
